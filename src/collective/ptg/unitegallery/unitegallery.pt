@@ -1,5 +1,5 @@
 <div id="gallery" class="unitegallery"  
-    tal:define="theclass python:'unitegallery-container unitegallerytheme_' + view.settings.gallery_theme"  tal:attributes="class theclass" >
+    tal:define="theclass python:'unitegallery-container unitegallerytheme_' + view.theme"  tal:attributes="class theclass" >
     <tal:images tal:repeat="img view/adapter/cooked_images">
         <img title="Image"
              tal:attributes="title img/title;

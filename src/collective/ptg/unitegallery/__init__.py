@@ -2,6 +2,7 @@
 """Init and utils."""
 import logging
 from zope.i18nmessageid import MessageFactory
+from Products.CMFPlone.utils import getFSVersionTuple
 from collective.plonetruegallery.utils import createSettingsFactory
 from zope.schema.vocabulary import SimpleVocabulary, SimpleTerm
 from collective.plonetruegallery.browser.views.display import BaseDisplayType
@@ -13,6 +14,7 @@ from plone.memoize.view import memoize
 LOG = logging.getLogger(__name__)
 _ = MessageFactory('collective.ptg.unitegallery')
 
+timed_galleries = ['default', 'compact', 'grid', 'slider']
 
 class UniteGalleryCommon(BaseDisplayType):
     name = u"unitegallery"
@@ -48,20 +50,51 @@ class UniteGalleryCommon(BaseDisplayType):
     'skin':skin,
     }
 
-    def javascript(self):
+    def galleryscript(self):
         return u"""
-<script type="text/javascript">
-requirejs(["%(base_url)s/js/unitegallery.min.js"], function(util) {
-    requirejs(["%(theme_js_url)s"], function(util) {
-        (function($){
             $(document).ready(function() {
                 $("#gallery").each(function(){
                         $(this).unitegallery({
 			            %(gallery_theme)s
+			            %(gallery_autoplay)s
+			            %(gallery_play_interval)s
+			            %(slider_transition_speed)s
 			            %(theme_options)s
 			        });
 			    });
             });
+            """ % {
+            'gallery_theme':self.theme != 'default' and 'gallery_theme: "'+self.theme+'",' or '',
+            'gallery_autoplay':(self.settings.timed and self.theme in timed_galleries) and 'gallery_autoplay: '+jsbool(self.settings.timed)+',' or '',
+            'gallery_play_interval':self.theme in timed_galleries and 'gallery_play_interval: '+str(self.settings.delay)+',' or '',
+            'slider_transition_speed': self.theme in timed_galleries and 'slider_transition_speed: '+str(self.settings.duration)+',' or '',
+            'theme_options':',\n'.join(k+':'+v for k,v in self.theme_options().items()),
+            }
+
+    def javascript(self):
+        if getFSVersionTuple()[0] < 5:
+            return u"""
+<script type="text/javascript" src="%(base_url)s/js/unitegallery.min.js"></script>
+<script type="text/javascript" src="%(theme_js_url)s"></script>
+<script type="text/javascript">
+        (function($){
+            %(galleryscript)s
+        })(jQuery);
+</script>
+    """ % {
+            'start_index_index': self.start_image_index,
+            'staticFiles':  self.staticFiles,
+            'base_url': self.typeStaticFiles,
+            'theme_js_url':self.theme_js_url(),
+            'galleryscript':self.galleryscript()
+        }
+        else:
+            return u"""
+<script type="text/javascript">
+requirejs(["%(base_url)s/js/unitegallery.min.js"], function(util) {
+    requirejs(["%(theme_js_url)s"], function(util) {
+        (function($){
+            %(galleryscript)s
         })(jQuery);
     });
 });
@@ -70,9 +103,8 @@ requirejs(["%(base_url)s/js/unitegallery.min.js"], function(util) {
             'start_index_index': self.start_image_index,
             'staticFiles':  self.staticFiles,
             'base_url': self.typeStaticFiles,
-            'gallery_theme':self.theme != 'default' and 'gallery_theme: "'+self.theme+'",' or '',
             'theme_js_url':self.theme_js_url(),
-            'theme_options':',\n'.join(k+':'+v for k,v in self.theme_options().items()),
+            'galleryscript':self.galleryscript()
         }
 
     def theme_options(self):

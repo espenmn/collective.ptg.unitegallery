@@ -4,6 +4,7 @@ from collective.plonetruegallery.utils import createSettingsFactory
 from zope.schema.vocabulary import SimpleVocabulary, SimpleTerm
 from zope.i18nmessageid import MessageFactory
 from zope.interface import Interface
+from zope.interface.interface import InterfaceClass
 from zope import schema
 from collective.plonetruegallery.interfaces import IBaseSettings
 _ = MessageFactory('collective.ptg.unitegallery')
@@ -28,7 +29,7 @@ class IUniteGalleryTilesSettings(IBaseSettings):
         default=0)
     tiles_theme_appearance_order = schema.Choice(
         title=_(u"unitegallery_theme_appearance_order_title", default=u"Appearance order of the tiles"),
-        default='normal',
+        default=u'normal',
         vocabulary=SimpleVocabulary([
             SimpleTerm('normal', 'normal', _(u"label_normal", default=u"Normal")),
             SimpleTerm('shuffle', 'shuffle', _(u"label_shuffle", default=u"Shuffle")),
@@ -298,6 +299,89 @@ class IUniteGalleryTilesSettings(IBaseSettings):
         title=_(u"unitegallery_tile_textpanel_css_description_title", default=u"Textpanel additional css of the description"),
         default=u"{}")
 
+    #lightbox options:
+    tiles_lightbox_type = schema.Choice(
+        title=_(u"unitegallery_lightbox_type_title", default=u"Lightbox type"),
+        default=u'wide',
+        vocabulary=SimpleVocabulary([
+            SimpleTerm('compact', 'compact', _(u"label_compact", default=u"Compact")),
+            SimpleTerm('wide', 'wide', _(u"label_wide", default=u"Wide")),
+        ]))
+    tiles_lightbox_hide_arrows_onvideoplay = schema.Bool(
+        title=_(u"unitegallery_lightbox_hide_arrows_onvideoplay_title", default=u"Hide the arrows when video start playing and show when stop"),
+        default=True)
+    tiles_lightbox_arrows_position = schema.Choice(
+        title=_(u"unitegallery_lightbox_arrows_position_title", default=u"Position of the arrows, used on compact type"),
+        default=u'sides',
+        vocabulary=SimpleVocabulary([
+            SimpleTerm('sides', 'sides', _(u"label_sides", default=u"Sides")),
+            SimpleTerm('inside', 'inside', _(u"label_inside", default=u"Inside")),
+        ]))
+    tiles_lightbox_arrows_offset = schema.Int(
+        title=_(u"unitegallery_lightbox_arrows_offset_title", default=u"The horizontal offset of the arrows"),
+        default=10)
+    tiles_lightbox_arrows_inside_offset = schema.Int(
+        title=_(u"unitegallery_lightbox_arrows_inside_offset_title", default=u"The offset from the image border if the arrows placed inside"),
+        default=10)
+    tiles_lightbox_arrows_inside_alwayson = schema.Bool(
+        title=_(u"unitegallery_lightbox_arrows_inside_alwayson_title", default=u"Show the arrows on mouseover, or always on"),
+        default=False)
+    tiles_lightbox_overlay_color = schema.TextLine(
+        title=_(u"unitegallery_lightbox_overlay_color_title", default=u"The color of the overlay. if empty - take from css"),
+        default=u"",
+        required=False)
+    tiles_lightbox_overlay_opacity = schema.Float(
+        title=_(u"unitegallery_lightbox_arrows_inside_offset_title", default=u"The opacity of the overlay. for compact type - 0.6"),
+        default=1.0,
+        required=False)
+    tiles_lightbox_top_panel_opacity = schema.Float(
+        title=_(u"unitegallery_lightbox_top_panel_opacity_title", default=u"The opacity of the top panel. if empty - take from css"),
+        default=1.0,
+        required=False)
+    tiles_lightbox_close_on_emptyspace = schema.Bool(
+        title=_(u"unitegallery_lightbox_close_on_emptyspace_title", default=u"Close the lightbox on empty space"),
+        default=True)
+    tiles_lightbox_show_numbers = schema.Bool(
+        title=_(u"unitegallery_lightbox_show_numbers_title", default=u"Show numbers on the right side"),
+        default=True)
+    tiles_lightbox_numbers_size = schema.TextLine(
+        title=_(u"unitegallery_lightbox_numbers_size_title", default=u"The size of the numbers string"),
+        default=u"",
+        required=False)
+    tiles_lightbox_numbers_color = schema.TextLine(
+        title=_(u"unitegallery_lightbox_numbers_color_title", default=u"The color of the numbers"),
+        default=u"",
+        required=False)
+    tiles_lightbox_numbers_padding_top = schema.TextLine(
+        title=_(u"unitegallery_lightbox_numbers_padding_top_title", default=u"The top padding of the numbers (used in compact mode)"),
+        default=u"",
+        required=False)
+    tiles_lightbox_numbers_padding_right = schema.TextLine(
+        title=_(u"unitegallery_lightbox_numbers_padding_right_title", default=u"The right padding of the numbers (used in compact mode)"),
+        default=u"",
+        required=False)
+    tiles_lightbox_slider_image_border = schema.Bool(
+        title=_(u"unitegallery_lightbox_slider_image_border_title", default=u"Enable border around the image (for compact type only)"),
+        default=True)
+    tiles_lightbox_slider_image_border_width = schema.Int(
+        title=_(u"unitegallery_lightbox_slider_image_border_width_title", default=u"Image border width"),
+        default=10)
+    tiles_lightbox_slider_image_border_color = schema.TextLine(
+        title=_(u"unitegallery_lightbox_slider_image_border_color_title", default=u"Image border color"),
+        default=u"#ffffff")
+    tiles_lightbox_slider_image_border_radius = schema.Int(
+        title=_(u"unitegallery_lightbox_slider_image_border_radius_title", default=u"Image border radius"),
+        default=0)
+    tiles_lightbox_slider_image_shadow = schema.Bool(
+        title=_(u"unitegallery_lightbox_slider_image_shadow_title", default=u"Enable border shadow the image"),
+        default=True)
+    tiles_lightbox_slider_control_swipe = schema.Bool(
+        title=_(u"unitegallery_lightbox_slider_control_swipe_title", default=u"Enable swiping control"),
+        default=True)
+    tiles_lightbox_slider_control_zoom = schema.Bool(
+        title=_(u"unitegallery_lightbox_slider_control_zoom_title", default=u"Enable zooming control"),
+        default=True)
+
 
 class UniteGalleryTilesType(UniteGalleryCommon):
     """Unite Gallery Tiles"""
@@ -314,7 +398,14 @@ class UniteGalleryTilesType(UniteGalleryCommon):
 'tile_textpanel_desc_font_family',
 'tile_textpanel_desc_text_align',
 'tile_textpanel_desc_font_size',
-'tile_textpanel_desc_bold']
+'tile_textpanel_desc_bold',
+'lightbox_overlay_color',
+'lightbox_top_panel_opacity',
+'lightbox_numbers_size',
+'lightbox_numbers_color',
+'lightbox_numbers_padding_top',
+'lightbox_numbers_padding_right',
+]
 
     def theme_options(self):
         data = super(UniteGalleryTilesType, self).theme_options()
