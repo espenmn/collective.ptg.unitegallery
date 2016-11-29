@@ -31,3 +31,15 @@ report.html
 !.gitkeep
 !.travis.yml
 !src/collective
+
+*.pyc
+
+src/collective/ptg/unitegallery/resources/.DS_Store
+
+src/collective/ptg/unitegallery/.DS_Store
+
+src/collective/.DS_Store
+
+src/collective/ptg/.DS_Store
+
+src/collective/ptg/unitegallery/resources/themes/.DS_Store

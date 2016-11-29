@@ -6,25 +6,26 @@ from zope import schema
 from collective.plonetruegallery.interfaces import IBaseSettings
 from collective.plonetruegallery.browser.views.display import jsbool
 _ = MessageFactory('collective.ptg.unitegallery')
+from plone.directives import form
 
-
-class IUniteGalleryDefaultSettings(IBaseSettings):
+class IUniteSettings(IBaseSettings):
 
     #Theme options
+
     default_theme_enable_fullscreen_button = schema.Bool(
         title=_(u"unitegallery_theme_enable_fullscreen_button_title", default=u"Theme fullscreen button"),
-	    description=_(u"unitegallery_theme_enable_fullscreen_button_description",
-	        default=u"show, hide the theme fullscreen button. The position in the theme is constant"),
+        description=_(u"unitegallery_theme_enable_fullscreen_button_description",
+            default=u"show, hide the theme fullscreen button. The position in the theme is constant"),
         default=True)
     default_theme_enable_play_button = schema.Bool(
         title=_(u"unitegallery_theme_enable_play_button_title", default=u"Theme play button"),
-	    description=_(u"unitegallery_theme_enable_play_button_description",
-	        default=u"show, hide the theme play button. The position in the theme is constant"),
+        description=_(u"unitegallery_theme_enable_play_button_description",
+            default=u"show, hide the theme play button. The position in the theme is constant"),
         default=True)
     default_theme_enable_hidepanel_button = schema.Bool(
         title=_(u"unitegallery_theme_enable_hidepanel_button_title", default=u"Theme hidepanel button"),
-	    description=_(u"unitegallery_theme_enable_hidepanel_button_description",
-	        default=u"show, hide the hidepanel button"),
+        description=_(u"unitegallery_theme_enable_hidepanel_button_description",
+            default=u"show, hide the hidepanel button"),
         default=True)
     default_theme_enable_text_panel = schema.Bool(
         title=_(u"unitegallery_theme_enable_text_panel_title", default=u"Enable the panel text panel"),
@@ -107,28 +108,29 @@ class IUniteGalleryDefaultSettings(IBaseSettings):
         title=_(u"unitegallery_gallery_background_color_title", default=u"Set custom background color. If not set it will be taken from css"),
         default=u'',
         required=False)
-					
+                    
+class IUniteGalleryDefaultSettings(IUniteSettings):
     #Thumb options
     default_thumb_round_corners_radius = schema.Int(
         title=_(u"unitegallery_thumb_round_corners_radius_title", default=u"Thumb border radius"),
         default=0)
     default_thumb_color_overlay_effect = schema.Bool(
-	    title=_(u"unitegallery_thumb_color_overlay_effect_title", default=u"Thumb color overlay effect"),
-	    description=_(u"unitegallery_thumb_color_overlay_effect_description",
-	        default=u"thumb color overlay effect, release the overlay on mouseover and selected states"),
-	    default=True)
+        title=_(u"unitegallery_thumb_color_overlay_effect_title", default=u"Thumb color overlay effect"),
+        description=_(u"unitegallery_thumb_color_overlay_effect_description",
+            default=u"thumb color overlay effect, release the overlay on mouseover and selected states"),
+        default=True)
     default_thumb_overlay_color = schema.TextLine(
-	    title=_(u"unitegallery_thumb_overlay_color_title", default=u"Thumb overlay color"),
-	    default=u"#000000")	
+        title=_(u"unitegallery_thumb_overlay_color_title", default=u"Thumb overlay color"),
+        default=u"#000000") 
     default_thumb_overlay_opacity = schema.Float(
-	    title=_(u"unitegallery_thumb_overlay_opacity_title", default=u"Thumb overlay color opacity"),
-	    default=0.4)
+        title=_(u"unitegallery_thumb_overlay_opacity_title", default=u"Thumb overlay color opacity"),
+        default=0.4)
     default_thumb_overlay_reverse = schema.Bool(
-	    title=_(u"unitegallery_thumb_overlay_reverse_title", default=u"Reverse the overlay, will be shown on selected state only"),
-	    default=False)
+        title=_(u"unitegallery_thumb_overlay_reverse_title", default=u"Reverse the overlay, will be shown on selected state only"),
+        default=False)
     default_thumb_image_overlay_effect = schema.Bool(
-	    title=_(u"unitegallery_thumb_image_overlay_effect_title", default=u"Images overlay effect on normal state only"),
-	    default=False)
+        title=_(u"unitegallery_thumb_image_overlay_effect_title", default=u"Images overlay effect on normal state only"),
+        default=False)
     default_thumb_image_overlay_type = schema.Choice(
         title=_(u"unitegallery_thumb_image_overlay_type_title", default=u"Image effect overlay"),
         default=u'bw',
@@ -145,5 +147,22 @@ class UniteGalleryDefaultType(UniteGalleryCommon):
     theme = 'default'
     description = 'Unite Gallery Default'
     schema = IUniteGalleryDefaultSettings
+    
+    form.fieldset(
+         'theme_options',
+          label=_(u'Theme options'),
+           fields=[
+                'default_theme_enable_fullscreen_button',
+                'default_theme_enable_play_button', 
+                'default_theme_enable_hidepanel_button',  
+                'default_theme_enable_text_panel',  
+                'default_theme_text_padding_left', 
+                'default_theme_text_padding_right',  
+                'default_theme_text_align', 
+                'default_theme_text_type', 
+                'default_theme_hide_panel_under_width',
+             ],
+    )
+
 
 UniteGalleryDefaultSettings = createSettingsFactory(UniteGalleryDefaultType.schema)
